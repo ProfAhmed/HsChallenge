@@ -1,10 +1,12 @@
 package com.hubstaff.challenge.screen
 
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
@@ -26,11 +28,13 @@ import com.hubstaff.challenge.screen.sign_in.SignInScreen
 import com.hubstaff.challenge.screen.sign_in.SignInViewModel
 import com.hubstaff.challenge.screen.timer.TimerScreen
 import com.hubstaff.theme.HubstaffAppTheme
+import com.netsoft.android.timer.TimeTicker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
@@ -39,6 +43,11 @@ class MainActivity : ComponentActivity() {
     private lateinit var sharedPreferences: SharedPreferences // to save login state when app killed
     private lateinit var editor: SharedPreferences.Editor   //for big apps we handle it in separate class
     private val viewModel: SignInViewModel by viewModels()
+
+    @Inject
+    lateinit var timeTicker: TimeTicker
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -91,6 +100,7 @@ class MainActivity : ComponentActivity() {
         mToast(this, msg = msg)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun Main(signInViewModel: SignInViewModel) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -109,12 +119,13 @@ class MainActivity : ComponentActivity() {
                     }
 
                 composable(Routes.Timer.route) {
-                    TimerScreen(navController = navController)
+                    TimerScreen(navController = navController, timeTicker)
                 }
             }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Preview
     @Composable
     fun DefaultPreview(
